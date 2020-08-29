@@ -3,7 +3,8 @@
 #此脚本一键安装Nginx1.18.0 PHP7.2 MySQL5.7
 #URL为安装请求域名需加http或https结尾无/
 function Install_exit(){
-rm -rf *.sh *.zip *.gz *.rpm *repo *.tar nginx-1.18.0
+cd
+rm -rf *.sh* *.zip *.gz *.rpm *repo *.tar nginx-1.18.0
 }
 function Install_finish(){
 echo -e "\033[32m 脚本已安装完毕
@@ -43,6 +44,13 @@ chown -R nobody:nobody /var/opt/remi/php72/lib/php/session
 systemctl start php72-php-fpm.service
 systemctl enable php72-php-fpm.service
 yum -y install redis
+systemctl stop redis
+sed -i "61c\bind 127.0.0.1" /etc/redis.conf
+sed -i "80c\protected-mode no" /etc/redis.conf
+sed -i "128c\daemonize yes" /etc/redis.conf
+sed -i "480a\requirepass adjlkasjdlkasj" /etc/redis.conf
+systemctl start redis
+systemctl enable redis
 #更换yum为网易
 #yum -y install wget
 #rm -rf /etc/yum.repos.d/*
@@ -121,8 +129,8 @@ systemctl start mysqld
 echo "您的MySQL数据库密码为${newpassword}"
 #自动配置API系统及前端系统
 nginx -s stop
-sed -i '2a\user nobody;' /usr/local/nginx/conf/nginx.conf
-sed -i '33a\    include /usr/local/nginx/conf.d/*.conf;' /usr/local/nginx/conf/nginx.conf
+sed -i "2a\user nobody;" /usr/local/nginx/conf/nginx.conf
+sed -i "33a\    include /usr/local/nginx/conf.d/*.conf;" /usr/local/nginx/conf/nginx.conf
 nginx
 mkdir -p /usr/local/nginx/conf.d
 mkdir -p /www/wwwroot/${html_URL}
